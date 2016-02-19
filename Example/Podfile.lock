@@ -9,6 +9,6 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  PlayerView: be54579567d2f4b6d883a7bebd372eb6943a7179
+  PlayerView: 4252c1cb2fae5e3d81667dde971dc3a56d83d540
 
 COCOAPODS: 0.39.0
