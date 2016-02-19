@@ -5,6 +5,7 @@
 [![License](https://img.shields.io/cocoapods/l/PlayerView.svg?style=flat)](http://cocoapods.org/pods/PlayerView)
 [![Platform](https://img.shields.io/cocoapods/p/PlayerView.svg?style=flat)](http://cocoapods.org/pods/PlayerView)
 
+An elegant wraper API for AVPlayer to get events over Delegate so you dount need to use KVO
 
 ## Installation
 
