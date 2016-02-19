@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = "PlayerView"
   s.version          = "0.1.0"
-  s.summary          = "A short description of PlayerView."
+  s.summary          = "a View for videos using AVPlayer with delegate"
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -17,9 +17,10 @@ Pod::Spec.new do |s|
 #   * Write the description between the DESC delimiters below.
 #   * Finally, don't worry about the indent, CocoaPods strips it!  
   s.description      = <<-DESC
+                        This Library allows to set a video on a custom UIView by setting the callbacks on a delegate for easy use. this View implements the AVPlayer from AVFoundation
                        DESC
 
-  s.homepage         = "https://github.com/<GITHUB_USERNAME>/PlayerView"
+  s.homepage         = "https://github.com/davidlondono/PlayerView"
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
   s.license          = 'MIT'
   s.author           = { "David Alejandro" => "davidlondono9@gmail.com" }

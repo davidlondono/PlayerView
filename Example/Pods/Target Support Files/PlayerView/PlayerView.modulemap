@@ -1,0 +1,6 @@
+framework module PlayerView {
+  umbrella header "PlayerView-umbrella.h"
+
+  export *
+  module * { export * }
+}
