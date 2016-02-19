@@ -5,6 +5,8 @@
 [![License](https://img.shields.io/cocoapods/l/PlayerView.svg?style=flat)](http://cocoapods.org/pods/PlayerView)
 [![Platform](https://img.shields.io/cocoapods/p/PlayerView.svg?style=flat)](http://cocoapods.org/pods/PlayerView)
 
+[TOC]
+
 ## Installation
 
 PlayerView is available through [CocoaPods](http://cocoapods.org). To install
