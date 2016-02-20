@@ -98,7 +98,7 @@ view.addSubView(playerVideo)
 ```Swift
 //set aspect mode of video
 //default AVLayerVideoGravityResizeAspectFill
-playerVideo.fillMode = AVLayerVideoGravityResizeAspect
+playerVideo.fillMode = .ResizeAspect
 
 //Set or Get the seconds of the current time of reproduction
 //this will set to reproduce on 3.5 seconds
