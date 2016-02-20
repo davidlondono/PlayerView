@@ -23,6 +23,38 @@ public protocol PlayerViewDelegate {
     func playerVideo(player: PlayerView, rate: Float)
 }
 
+
+public enum PlayerViewFillMode {
+    case ResizeAspect
+    case ResizeAspectFill
+    case Resize
+    
+    init?(videoGravity: String){
+        switch videoGravity {
+        case AVLayerVideoGravityResizeAspect:
+            self = .ResizeAspect
+        case AVLayerVideoGravityResizeAspectFill:
+            self = .ResizeAspectFill
+        case AVLayerVideoGravityResize:
+            self = .Resize
+        default:
+            return nil
+        }
+    }
+    
+    var AVLayerVideoGravity:String {
+        get {
+            switch self {
+            case .ResizeAspect:
+                return AVLayerVideoGravityResizeAspect
+            case .ResizeAspectFill:
+                return AVLayerVideoGravityResizeAspectFill
+            case .Resize:
+                return AVLayerVideoGravityResize
+            }
+        }
+    }
+}
 /// A simple `UIView` subclass that is backed by an `AVPlayerLayer` layer.
 @objc public class PlayerView: UIView {
     
@@ -47,12 +79,9 @@ public protocol PlayerViewDelegate {
     }
     
     
-    public var fillMode: String! {
-        get {
-            return playerLayer.videoGravity
-        }
-        set {
-            playerLayer.videoGravity = newValue
+    public var fillMode: PlayerViewFillMode! {
+        didSet {
+            playerLayer.videoGravity = fillMode.AVLayerVideoGravity
         }
     }
     
@@ -101,7 +130,7 @@ public protocol PlayerViewDelegate {
         }
     }
     
-    // MARK: public Functions 
+    // MARK: public Functions
     
     public func play() {
         player?.play()
@@ -125,6 +154,18 @@ public protocol PlayerViewDelegate {
         return kCMTimeRangeZero
     }
     
+    public func screenshot() throws -> UIImage? {
+        guard let player = player , let asset = player.currentItem?.asset else {
+            return nil
+        }
+        let imageGenerator: AVAssetImageGenerator = AVAssetImageGenerator(asset: asset)
+        guard let time = player.currentItem?.currentTime() else {
+            return nil
+        }
+        let ref = try imageGenerator.copyCGImageAtTime(time, actualTime: nil)
+        let viewImage: UIImage = UIImage(CGImage: ref)
+        return viewImage
+    }
     
     public func setUrl(url: NSURL) {
         let avPlayer = AVPlayer(URL: url)
@@ -149,10 +190,10 @@ public protocol PlayerViewDelegate {
         }
         
         avPlayer.addObserver(self, forKeyPath: "status", options: [.New], context: &statusContext)
+        avPlayer.addObserver(self, forKeyPath: "rate", options: [.New], context: &rateContext)
         playerItem.addObserver(self, forKeyPath: "loadedTimeRanges", options: [], context: &loadedContext)
         playerItem.addObserver(self, forKeyPath: "duration", options: [], context: &durationContext)
         playerItem.addObserver(self, forKeyPath: "status", options: [], context: &statusItemContext)
-        avPlayer.addObserver(self, forKeyPath: "rate", options: [.New], context: &rateContext)
         //playerItem.addObserver(self, forKeyPath: "currentTime", options: [], context: &currentTimeContext)
         avPlayer.status
         // Do any additional setup after loading the view, typically from a nib.
@@ -166,20 +207,43 @@ public protocol PlayerViewDelegate {
     
     public convenience init() {
         self.init(frame: CGRect.zero)
+        
+        self.fillMode = .ResizeAspect
     }
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
         
-        self.fillMode = AVLayerVideoGravityResizeAspect
+        self.fillMode = .ResizeAspect
     }
     
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
-        self.fillMode = AVLayerVideoGravityResizeAspect
+        self.fillMode = .ResizeAspect
     }
     
+    deinit {
+        delegate = nil
+        guard let player = player else {
+            return
+        }
+        player.pause()
+        if let timeObserverToken = timeObserverToken {
+            player.removeTimeObserver(timeObserverToken)
+        }
+        
+        player.removeObserver(self, forKeyPath: "status", context: &statusContext)
+        player.removeObserver(self, forKeyPath: "rate", context: &rateContext)
+        
+        
+        if let playerItem = player.currentItem {
+            playerItem.removeObserver(self, forKeyPath: "loadedTimeRanges", context: &loadedContext)
+            playerItem.removeObserver(self, forKeyPath: "duration", context: &durationContext)
+            playerItem.removeObserver(self, forKeyPath: "status", context: &statusItemContext)
+        }
+        self.player = nil
+    }
     // MARK: private variables for context KVO
     
     private var statusContext = true

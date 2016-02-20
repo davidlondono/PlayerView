@@ -28,29 +28,23 @@ class ViewController: UIViewController {
     
     var duration: Float!
     var isEditingSlider = false
-    
+    let tap = UITapGestureRecognizer()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print("will load")
-        //let controller = PlayerVideoViewController()
-        //controller.delegate = self
-        //controller.view.frame = self.view.bounds
-        //addChildViewController(controller)
-        //view.insertSubview(controller.view, atIndex: 0)
-        
-        
-        //let playerVideo = PlayerView()
-        //playerVideo.delegate = self
-        //playerVideo.frame = self.view.bounds
-        //view.insertSubview(playerVideo, atIndex: 0)
         
         
         playerVideo.delegate = self
         let url = NSURL(string: "http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4")!
         
         playerVideo.setUrl(url)
+        
+        tap.numberOfTapsRequired = 2
+        tap.addTarget(self, action: "changeFill:")
+        view.addGestureRecognizer(tap)
+        
+        
         // Do any additional setup after loading the view, typically from a nib.
     }
     
@@ -88,6 +82,18 @@ class ViewController: UIViewController {
         playerVideo.rate = playerVideo.rate + 0.5
     }
     
+    func changeFill(sender: AnyObject) {
+        switch playerVideo.fillMode {
+        case .Some(.ResizeAspect):
+                playerVideo.fillMode = .ResizeAspectFill
+        case .Some(.ResizeAspectFill):
+            playerVideo.fillMode = .Resize
+        case .Some(.Resize):
+            playerVideo.fillMode = .ResizeAspect
+        default:
+            break
+        }
+    }
     override func loadView() {
         super.loadView()
     }
