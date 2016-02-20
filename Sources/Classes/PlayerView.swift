@@ -14,7 +14,7 @@ public typealias PlayerViewStatus = AVPlayerStatus
 public typealias PlayerViewItemStatus = AVPlayerItemStatus
 public typealias PlayerviewTimeRange = CMTimeRange
 
-public protocol PlayerViewDelegate {
+public protocol PlayerViewDelegate: class {
     func playerVideo(player: PlayerView, statusPlayer: PlayerViewStatus, error: NSError?)
     func playerVideo(player: PlayerView, statusItemPlayer: PlayerViewItemStatus, error: NSError?)
     func playerVideo(player: PlayerView, loadedTimeRanges: [PlayerviewTimeRange])
@@ -66,7 +66,7 @@ public enum PlayerViewFillMode {
     private var timeObserverToken: AnyObject?
     
     //MARK: - Public Variables
-    public var delegate: PlayerViewDelegate?
+    public weak var delegate: PlayerViewDelegate?
     
     public var player: AVPlayer? {
         get {
