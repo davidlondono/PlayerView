@@ -125,7 +125,7 @@ extension ViewController: PlayerViewDelegate {
         if loadedTimeRanges.count > 1 {
             print(loadedTimeRanges.count)
         }
-        //print(progress,duration, dur2)
+        //print("progress",progress)
     }
     func playerVideo(player: PlayerView, duration: Double) {
         //print(duration.seconds)
@@ -137,7 +137,7 @@ extension ViewController: PlayerViewDelegate {
         if !isEditingSlider {
             slider.value = Float(currentTime)
         }
-        //print(currentTime.seconds)
+        //print("curentTime",currentTime)
     }
     
     func playerVideo(player: PlayerView, rate: Float) {

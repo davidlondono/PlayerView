@@ -63,8 +63,9 @@ public enum PlayerViewFillMode {
     private var playerLayer: AVPlayerLayer {
         return layer as! AVPlayerLayer
     }
-    private var timeObserverToken: AnyObject?
     
+    private var timeObserverToken: AnyObject?
+    private weak var lastPlayerTimeObserve: AVPlayer?
     //MARK: - Public Variables
     public weak var delegate: PlayerViewDelegate?
     
@@ -74,6 +75,7 @@ public enum PlayerViewFillMode {
         }
         
         set {
+            print("DOUBLE SET")
             playerLayer.player = newValue
         }
     }
@@ -103,16 +105,8 @@ public enum PlayerViewFillMode {
     }
     public var interval = CMTimeMake(1, 60) {
         didSet {
-            guard let player = player else {
-                return
-            }
-            if let timeObserverToken = timeObserverToken {
-                player.removeTimeObserver(timeObserverToken)
-            }
-            self.timeObserverToken = player.addPeriodicTimeObserverForInterval(interval, queue: dispatch_get_main_queue()) { [weak self] time-> Void in
-                if let mySelf = self {
-                    self?.delegate?.playerVideo(mySelf, currentTime: mySelf.currentTime)
-                }
+            if rate != 0 {
+                addCurrentTimeObserver()
             }
         }
     }
@@ -124,12 +118,51 @@ public enum PlayerViewFillMode {
             }
             return player.rate
         }
-        
         set {
             player?.rate = newValue
         }
     }
+    // MARK: private Functions
     
+    func resetPlayer() {
+        guard let player = player else {
+            return
+        }
+        player.pause()
+        if let timeObserverToken = timeObserverToken {
+            player.removeTimeObserver(timeObserverToken)
+        }
+        
+        player.removeObserver(self, forKeyPath: "status", context: &statusContext)
+        player.removeObserver(self, forKeyPath: "rate", context: &rateContext)
+        
+        
+        if let playerItem = player.currentItem {
+            playerItem.removeObserver(self, forKeyPath: "loadedTimeRanges", context: &loadedContext)
+            playerItem.removeObserver(self, forKeyPath: "duration", context: &durationContext)
+            playerItem.removeObserver(self, forKeyPath: "status", context: &statusItemContext)
+        }
+        self.player = nil
+    }
+    
+    func removeCurrentTimeObserver() {
+        
+        if let timeObserverToken = self.timeObserverToken {
+            lastPlayerTimeObserve?.removeTimeObserver(timeObserverToken)
+        }
+        timeObserverToken = nil
+    }
+    
+    func addCurrentTimeObserver() {
+        removeCurrentTimeObserver()
+        
+        lastPlayerTimeObserve = player
+        self.timeObserverToken = player?.addPeriodicTimeObserverForInterval(interval, queue: dispatch_get_main_queue()) { [weak self] time-> Void in
+            if let mySelf = self {
+                self?.delegate?.playerVideo(mySelf, currentTime: mySelf.currentTime)
+            }
+        }
+    }
     // MARK: public Functions
     
     public func play() {
@@ -168,6 +201,9 @@ public enum PlayerViewFillMode {
     }
     
     public func setUrl(url: NSURL) {
+        
+        //reset before put another URL
+        resetPlayer()
         let avPlayer = AVPlayer(URL: url)
         self.player = avPlayer
         
@@ -182,12 +218,6 @@ public enum PlayerViewFillMode {
         avPlayer.status
         playerItem.status
         
-        
-        timeObserverToken = avPlayer.addPeriodicTimeObserverForInterval(interval, queue: dispatch_get_main_queue()) { [weak self] time-> Void in
-            if let mySelf = self {
-                self?.delegate?.playerVideo(mySelf, currentTime: mySelf.currentTime)
-            }
-        }
         
         avPlayer.addObserver(self, forKeyPath: "status", options: [.New], context: &statusContext)
         avPlayer.addObserver(self, forKeyPath: "rate", options: [.New], context: &rateContext)
@@ -225,24 +255,7 @@ public enum PlayerViewFillMode {
     
     deinit {
         delegate = nil
-        guard let player = player else {
-            return
-        }
-        player.pause()
-        if let timeObserverToken = timeObserverToken {
-            player.removeTimeObserver(timeObserverToken)
-        }
-        
-        player.removeObserver(self, forKeyPath: "status", context: &statusContext)
-        player.removeObserver(self, forKeyPath: "rate", context: &rateContext)
-        
-        
-        if let playerItem = player.currentItem {
-            playerItem.removeObserver(self, forKeyPath: "loadedTimeRanges", context: &loadedContext)
-            playerItem.removeObserver(self, forKeyPath: "duration", context: &durationContext)
-            playerItem.removeObserver(self, forKeyPath: "status", context: &statusItemContext)
-        }
-        self.player = nil
+        resetPlayer()
     }
     // MARK: private variables for context KVO
     
@@ -287,7 +300,6 @@ public enum PlayerViewFillMode {
                 
             }
             
-            
         } else if context == &statusItemContext{
             //status of item has changed
             if let currentItem = player?.currentItem {
@@ -300,6 +312,12 @@ public enum PlayerViewFillMode {
                 return
             }
             let newRate = newRateNumber.floatValue
+            if newRate == 0 {
+                removeCurrentTimeObserver()
+            } else {
+                addCurrentTimeObserver()
+            }
+            
             self.delegate?.playerVideo(self, rate: newRate)
             
         } else {
