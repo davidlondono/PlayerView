@@ -137,15 +137,8 @@ public enum PlayerViewFillMode
     {
         didSet
         {
-            guard let player = self.player else {
-                return
-            }
-            player.removeTimeObserver(timeObserverToken)
-            self.timeObserverToken = player.addPeriodicTimeObserverForInterval(interval, queue: dispatch_get_main_queue()) { [weak self] time-> Void in
-                if let mySelf = self {
-                    self?.delegate?.playerVideo(mySelf, currentTime: mySelf.currentTime)
-                }
-            }
+            endTimeObserve()
+            beginTimeObserve()
         }
     }
     
