@@ -21,8 +21,33 @@ public protocol PlayerViewDelegate: class {
     func playerVideo(player: PlayerView, duration: Double)
     func playerVideo(player: PlayerView, currentTime: Double)
     func playerVideo(player: PlayerView, rate: Float)
+    func playerVideo(playerFinished player: PlayerView)
 }
 
+public extension PlayerViewDelegate {
+    
+    func playerVideo(player: PlayerView, statusPlayer: PlayerViewStatus, error: NSError?) {
+        
+    }
+    func playerVideo(player: PlayerView, statusItemPlayer: PlayerViewItemStatus, error: NSError?) {
+        
+    }
+    func playerVideo(player: PlayerView, loadedTimeRanges: [PlayerviewTimeRange]) {
+        
+    }
+    func playerVideo(player: PlayerView, duration: Double) {
+        
+    }
+    func playerVideo(player: PlayerView, currentTime: Double) {
+        
+    }
+    func playerVideo(player: PlayerView, rate: Float) {
+        
+    }
+    func playerVideo(playerFinished player: PlayerView) {
+        
+    }
+}
 
 public enum PlayerViewFillMode {
     case ResizeAspect
@@ -119,6 +144,12 @@ public enum PlayerViewFillMode {
             return player.rate
         }
         set {
+            if newValue == 0 {
+                removeCurrentTimeObserver()
+            } else if rate == 0 && newValue != 0 {
+                addCurrentTimeObserver()
+            }
+            
             player?.rate = newValue
         }
     }
@@ -166,17 +197,19 @@ public enum PlayerViewFillMode {
     // MARK: public Functions
     
     public func play() {
-        player?.play()
+        rate = 1
+        //player?.play()
     }
     
     public func pause() {
-        player?.pause()
+        rate = 0
+        //player?.pause()
     }
     
     
     public func stop() {
         currentTime = 0
-        player?.pause()
+        pause()
     }
     
     public func availableDuration() -> CMTimeRange {
@@ -199,34 +232,40 @@ public enum PlayerViewFillMode {
         let viewImage: UIImage = UIImage(CGImage: ref)
         return viewImage
     }
-    
-    public func setUrl(url: NSURL) {
-        
-        //reset before put another URL
-        resetPlayer()
-        let avPlayer = AVPlayer(URL: url)
-        self.player = avPlayer
-        
-        avPlayer.actionAtItemEnd = .None
-        
-        
-        //avPlayer.play()
-        
-        
-        let playerItem = avPlayer.currentItem!
-        
-        avPlayer.status
-        playerItem.status
-        
-        
-        avPlayer.addObserver(self, forKeyPath: "status", options: [.New], context: &statusContext)
-        avPlayer.addObserver(self, forKeyPath: "rate", options: [.New], context: &rateContext)
-        playerItem.addObserver(self, forKeyPath: "loadedTimeRanges", options: [], context: &loadedContext)
-        playerItem.addObserver(self, forKeyPath: "duration", options: [], context: &durationContext)
-        playerItem.addObserver(self, forKeyPath: "status", options: [], context: &statusItemContext)
-        //playerItem.addObserver(self, forKeyPath: "currentTime", options: [], context: &currentTimeContext)
-        avPlayer.status
-        // Do any additional setup after loading the view, typically from a nib.
+    public var url: NSURL? {
+        didSet {
+            guard let url = url else {
+                resetPlayer()
+                return
+            }
+            //reset before put another URL
+            resetPlayer()
+            let avPlayer = AVPlayer(URL: url)
+            self.player = avPlayer
+            
+            avPlayer.actionAtItemEnd = .None
+            
+            
+            //avPlayer.play()
+            
+            
+            let playerItem = avPlayer.currentItem!
+            
+            avPlayer.status
+            playerItem.status
+            
+            
+            avPlayer.addObserver(self, forKeyPath: "status", options: [.New], context: &statusContext)
+            avPlayer.addObserver(self, forKeyPath: "rate", options: [.New], context: &rateContext)
+            playerItem.addObserver(self, forKeyPath: "loadedTimeRanges", options: [], context: &loadedContext)
+            playerItem.addObserver(self, forKeyPath: "duration", options: [], context: &durationContext)
+            playerItem.addObserver(self, forKeyPath: "status", options: [], context: &statusItemContext)
+            //playerItem.addObserver(self, forKeyPath: "currentTime", options: [], context: &currentTimeContext)
+            
+             NSNotificationCenter.defaultCenter().addObserver(self, selector: "playerItemDidPlayToEndTime:", name: AVPlayerItemDidPlayToEndTimeNotification, object: playerItem)
+            avPlayer.status
+            // Do any additional setup after loading the view, typically from a nib.
+        }
     }
     
     // MARK: public object lifecycle view
@@ -266,6 +305,12 @@ public enum PlayerViewFillMode {
     private var currentTimeContext = true
     private var rateContext = true
     
+    
+    public func playerItemDidPlayToEndTime(aNotification: NSNotification) {
+        //notification of player to stop
+        pause()
+        self.delegate?.playerVideo(playerFinished: self)
+    }
     
     public override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         

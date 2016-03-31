@@ -11,6 +11,9 @@ import PlayerView
 import AVFoundation
 
 
+private extension Selector {
+    static let changeFill = #selector(ViewController.changeFill(_:))
+}
 
 
 class ViewController: UIViewController {
@@ -38,10 +41,10 @@ class ViewController: UIViewController {
         playerVideo.delegate = self
         let url = NSURL(string: "http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4")!
         
-        playerVideo.setUrl(url)
+        playerVideo.url = url
         
         tap.numberOfTapsRequired = 2
-        tap.addTarget(self, action: "changeFill:")
+        tap.addTarget(self, action: .changeFill)
         view.addGestureRecognizer(tap)
         
         
@@ -152,5 +155,9 @@ extension ViewController: PlayerViewDelegate {
         
         //slider.value = Float(currentTime)
         //print(currentTime.seconds)
+    }
+    
+    func playerVideo(playerFinished player: PlayerView) {
+        print("video has finished")
     }
 }

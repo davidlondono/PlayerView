@@ -125,11 +125,12 @@ playerVideo.stop()
 
 //to set the url of Video
 if let url = NSURL(string: "http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4") {
-	playerVideo.setUrl(url)
+	playerVideo.url = url
 }
 ```
 ## Delegate
 you could get event data from the PlayerView, just implement the delegate
+all the functions are optionals
 
 ```Swift
 import PlayerView
@@ -172,12 +173,17 @@ extension MyClass:PlayerViewDelegate {
 
 	func playerVideo(player: PlayerView, currentTime: Double) {
 		//executed using the playerVideo.interval
+        //only executed when the is reproducing, on pause (rate == 1) this doesn't execute
 		//default executed like 60 frames per seconds, so 60 times on a second
 	}
 
 	func playerVideo(player: PlayerView, rate: Float) {
 		//if the speed of reproduction changed by pausing, playing or changing speed
 	}
+
+    func playerVideo(playerFinished player: PlayerView) {
+        //when the video finishes the reproduction to the end
+    }
 }
 ```
 
