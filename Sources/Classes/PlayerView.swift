@@ -9,6 +9,9 @@
 import UIKit
 import AVFoundation.AVPlayer
 
+private extension Selector {
+    static let playerItemDidPlayToEndTime = #selector(PlayerView.playerItemDidPlayToEndTime(_:))
+}
 
 public typealias PlayerViewStatus = AVPlayerStatus
 public typealias PlayerViewItemStatus = AVPlayerItemStatus
@@ -262,7 +265,7 @@ public enum PlayerViewFillMode {
             playerItem.addObserver(self, forKeyPath: "status", options: [], context: &statusItemContext)
             //playerItem.addObserver(self, forKeyPath: "currentTime", options: [], context: &currentTimeContext)
             
-             NSNotificationCenter.defaultCenter().addObserver(self, selector: "playerItemDidPlayToEndTime:", name: AVPlayerItemDidPlayToEndTimeNotification, object: playerItem)
+             NSNotificationCenter.defaultCenter().addObserver(self, selector: .playerItemDidPlayToEndTime, name: AVPlayerItemDidPlayToEndTimeNotification, object: playerItem)
             avPlayer.status
             // Do any additional setup after loading the view, typically from a nib.
         }
