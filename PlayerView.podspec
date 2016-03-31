@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "PlayerView"
-  s.version          = "0.1.5"
+  s.version          = "0.2"
   s.summary          = "A UIView for videos using AVPlayer with delegate"
 
 # This description is used to generate tags and improve search results.
