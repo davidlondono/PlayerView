@@ -265,8 +265,6 @@ private extension CMTime {
         let ref = try imageGenerator.copyCGImageAtTime(cmTime, actualTime: &timePicture)
         let viewImage: UIImage = UIImage(CGImage: ref)
         return (viewImage, timePicture)
-
-        return nil
     }
     public var url: NSURL? {
         didSet {
