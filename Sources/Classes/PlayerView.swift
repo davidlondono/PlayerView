@@ -83,6 +83,10 @@ public enum PlayerViewFillMode {
         }
     }
 }
+
+private extension CMTime {
+    static var zero:CMTime { return kCMTimeZero }
+}
 /// A simple `UIView` subclass that is backed by an `AVPlayerLayer` layer.
 @objc public class PlayerView: UIView {
     
@@ -103,7 +107,6 @@ public enum PlayerViewFillMode {
         }
         
         set {
-            print("DOUBLE SET")
             playerLayer.player = newValue
         }
     }
@@ -128,7 +131,7 @@ public enum PlayerViewFillMode {
                 return
             }
             let newTime = CMTimeMakeWithSeconds(newValue, timescale)
-            player!.seekToTime(newTime,toleranceBefore: kCMTimeZero,toleranceAfter: kCMTimeZero)
+            player!.seekToTime(newTime,toleranceBefore: CMTime.zero,toleranceAfter: CMTime.zero)
         }
     }
     public var interval = CMTimeMake(1, 60) {
@@ -224,16 +227,46 @@ public enum PlayerViewFillMode {
     }
     
     public func screenshot() throws -> UIImage? {
+        guard let time = player?.currentItem?.currentTime() else {
+            return nil
+        }
+        
+        return try screenshotCMTime(time)?.0
+    }
+    
+    public func screenshotTime(time: Double? = nil) throws -> (UIImage, photoTime: CMTime)?{
+        guard let timescale = player?.currentItem?.duration.timescale else {
+            return nil
+        }
+        
+        let timeToPicture: CMTime
+        if let time = time {
+            
+            timeToPicture = CMTimeMakeWithSeconds(time, timescale)
+        } else if let time = player?.currentItem?.currentTime() {
+            timeToPicture = time
+        } else {
+            return nil
+        }
+        return try screenshotCMTime(timeToPicture)
+    }
+    
+    private func screenshotCMTime(cmTime: CMTime) throws -> (UIImage,photoTime: CMTime)? {
         guard let player = player , let asset = player.currentItem?.asset else {
             return nil
         }
-        let imageGenerator: AVAssetImageGenerator = AVAssetImageGenerator(asset: asset)
-        guard let time = player.currentItem?.currentTime() else {
-            return nil
-        }
-        let ref = try imageGenerator.copyCGImageAtTime(time, actualTime: nil)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        
+        var timePicture = CMTime.zero
+        imageGenerator.appliesPreferredTrackTransform = true
+        imageGenerator.requestedTimeToleranceAfter = CMTime.zero
+        imageGenerator.requestedTimeToleranceBefore = CMTime.zero
+        
+        let ref = try imageGenerator.copyCGImageAtTime(cmTime, actualTime: &timePicture)
         let viewImage: UIImage = UIImage(CGImage: ref)
-        return viewImage
+        return (viewImage, timePicture)
+
+        return nil
     }
     public var url: NSURL? {
         didSet {

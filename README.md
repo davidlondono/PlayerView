@@ -106,6 +106,7 @@ playerVideo.currentTime = 3.5
 
 //define the time interval to get callback delegate of the current time of reproduction, default sends 60 times on 1 second
 //default CMTimeMake(1, 60)
+//this send the time one time per one second
 playerVideo.interval = CMTimeMake(1, 1)
 
 //set and get the speed of reproduction
@@ -127,6 +128,16 @@ playerVideo.stop()
 if let url = NSURL(string: "http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4") {
 	playerVideo.url = url
 }
+
+//Take a screenshot on time, and return time to ensure the tolerance of the image
+//on 20.7 seconds
+let(image1, time1) = playerVideo.screenshotTime(20.7)
+//on actual time
+let(image2, time2) = playerVideo.screenshotTime()
+
+
+//on actual time
+let image3 = playerVideo.screenshot()
 ```
 ## Delegate
 you could get event data from the PlayerView, just implement the delegate
