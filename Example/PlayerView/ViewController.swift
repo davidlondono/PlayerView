@@ -39,10 +39,13 @@ class ViewController: UIViewController {
         
         
         playerVideo.delegate = self
+        let url1 = NSURL(string: "http://techslides.com/demos/sample-videos/small.mp4")!
         let url = NSURL(string: "http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4")!
         
-        playerVideo.url = url
+        //playerVideo.url = url
         
+        playerVideo.urls = [url1,url1]
+        playerVideo.addVideosOnQueue(urls: [url])
         tap.numberOfTapsRequired = 2
         tap.addTarget(self, action: .changeFill)
         view.addGestureRecognizer(tap)
@@ -121,7 +124,10 @@ extension ViewController: PlayerViewDelegate {
     }
     func playerVideo(player: PlayerView, loadedTimeRanges: [PlayerviewTimeRange]) {
         
-        let dur2 = Float(loadedTimeRanges.first!.end.seconds)
+        let durationTotal = loadedTimeRanges.reduce(0) { (actual, range) -> Double in
+            return actual + range.end.seconds
+        }
+        let dur2 = Float(durationTotal)
         let progress = dur2 / duration
         progressBar?.progress = progress
         
@@ -158,6 +164,8 @@ extension ViewController: PlayerViewDelegate {
     }
     
     func playerVideo(playerFinished player: PlayerView) {
+        player.next()
+        player.play()
         print("video has finished")
     }
 }

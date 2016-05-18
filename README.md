@@ -37,7 +37,7 @@ Installation is also available using the dependency manager [Carthage](https://g
 To integrate, add the following line to your `Cartfile`:
 
 ```ogdl
-github "davidlondono/PlayerView" >= 0.1.0
+github "davidlondono/PlayerView" >= 0.2.5
 ```
 
 ### Swift Package Manager
@@ -124,9 +124,18 @@ playerVideo.pause()
 // stop the video on current time
 playerVideo.stop()
 
+
+// stop the video on current time
+playerVideo.next()
+
 //to set the url of Video
 if let url = NSURL(string: "http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4") {
 	playerVideo.url = url
+    //or
+    playerVideo.urls = [url]
+
+    //add videos on queue
+    playerVideo.addVideosOnQueue(urls: [url])
 }
 
 //Take a screenshot on time, and return time to ensure the tolerance of the image
