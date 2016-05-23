@@ -147,6 +147,9 @@ let(image2, time2) = playerVideo.screenshotTime()
 
 //on actual time
 let image3 = playerVideo.screenshot()
+
+//reset queue and observers
+playerVideo.resetPlayer()
 ```
 ## Delegate
 you could get event data from the PlayerView, just implement the delegate
