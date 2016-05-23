@@ -45,7 +45,9 @@ class ViewController: UIViewController {
         //playerVideo.url = url
         
         playerVideo.urls = [url1,url1]
-        playerVideo.addVideosOnQueue(urls: [url])
+        playerVideo.loopVideosQueue = true
+        playerVideo.play()
+        //playerVideo.addVideosOnQueue(urls: [url])
         tap.numberOfTapsRequired = 2
         tap.addTarget(self, action: .changeFill)
         view.addGestureRecognizer(tap)
@@ -115,14 +117,14 @@ class ViewController: UIViewController {
 
 extension ViewController: PlayerViewDelegate {
     
-    func playerVideo(player: PlayerView, statusPlayer: PlayerViewStatus, error: NSError?) {
+    func playerVideo(player: PlayerView, statusPlayer: PVStatus, error: NSError?) {
         print(statusPlayer)
     }
     
-    func playerVideo(player: PlayerView, statusItemPlayer: PlayerViewItemStatus, error: NSError?) {
+    func playerVideo(player: PlayerView, statusItemPlayer: PVItemStatus, error: NSError?) {
         
     }
-    func playerVideo(player: PlayerView, loadedTimeRanges: [PlayerviewTimeRange]) {
+    func playerVideo(player: PlayerView, loadedTimeRanges: [PVTimeRange]) {
         
         let durationTotal = loadedTimeRanges.reduce(0) { (actual, range) -> Double in
             return actual + range.end.seconds
