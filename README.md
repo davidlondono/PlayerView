@@ -37,7 +37,7 @@ Installation is also available using the dependency manager [Carthage](https://g
 To integrate, add the following line to your `Cartfile`:
 
 ```ogdl
-github "davidlondono/PlayerView" >= 0.2.6
+github "davidlondono/PlayerView" >= 0.2.7
 ```
 
 ### Swift Package Manager

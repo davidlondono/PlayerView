@@ -229,11 +229,10 @@ private extension CMTime {
     func playerItemDidPlayToEndTime(aNotification: NSNotification) {
         //notification of player to stop
         let item = aNotification.object as! PVPlayerItem
-        print("count",player?.items().count)
         if loopVideosQueue && player?.items().count == 1,
             let urlsQueue = urlsQueue {
             
-            self.addVideosOnQueue(urls: urlsQueue, afterItem: nil)
+            self.addVideosOnQueue(urls: urlsQueue, afterItem: item)
         }
         self.delegate?.playerVideo(playerFinished: self)
     }
