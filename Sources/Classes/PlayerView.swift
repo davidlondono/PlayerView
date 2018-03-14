@@ -6,8 +6,8 @@
 //  Copyright © 2016 David Alejandro. All rights reserved.
 //
 
+import AVFoundation
 import UIKit
-import AVFoundation.AVPlayer
 
 private extension Selector {
     static let playerItemDidPlayToEndTime = #selector(PlayerView.playerItemDidPlayToEndTime(aNotification:))
@@ -63,28 +63,28 @@ public enum PlayerViewFillMode {
     case resizeAspectFill
     case resize
     
-    init?(videoGravity: String){
+    init?(videoGravity: AVLayerVideoGravity) {
         switch videoGravity {
-        case AVLayerVideoGravityResizeAspect:
+        case .resizeAspect:
             self = .resizeAspect
-        case AVLayerVideoGravityResizeAspectFill:
+        case .resizeAspectFill:
             self = .resizeAspectFill
-        case AVLayerVideoGravityResize:
+        case .resize:
             self = .resize
         default:
             return nil
         }
     }
     
-    var AVLayerVideoGravity:String {
+    var videoGravity: AVLayerVideoGravity {
         get {
             switch self {
             case .resizeAspect:
-                return AVLayerVideoGravityResizeAspect
+                return AVLayerVideoGravity.resizeAspect
             case .resizeAspectFill:
-                return AVLayerVideoGravityResizeAspectFill
+                return AVLayerVideoGravity.resizeAspectFill
             case .resize:
-                return AVLayerVideoGravityResize
+                return AVLayerVideoGravity.resize
             }
         }
     }
@@ -133,7 +133,7 @@ public class PlayerView: UIView {
     
     public var fillMode: PlayerViewFillMode! {
         didSet {
-            playerLayer.videoGravity = fillMode.AVLayerVideoGravity
+            playerLayer.videoGravity = fillMode.videoGravity
         }
     }
     
@@ -236,7 +236,7 @@ public class PlayerView: UIView {
             } as AnyObject?
     }
     
-    func playerItemDidPlayToEndTime(aNotification: NSNotification) {
+    @objc func playerItemDidPlayToEndTime(aNotification: NSNotification) {
         //notification of player to stop
         let item = aNotification.object as! PVPlayerItem
         if loopVideosQueue && player?.items().count == 1,
