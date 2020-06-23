@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
 #   * Think: What does it do? Why did you write it? What is the focus?
 #   * Try to keep it short, snappy and to the point.
 #   * Write the description between the DESC delimiters below.
-#   * Finally, don't worry about the indent, CocoaPods strips it!  
+#   * Finally, don't worry about the indent, CocoaPods strips it!
   s.description      = <<-DESC
                         This Library allows to set a video on a custom UIView by setting the callbacks on a delegate for easy use. this View implements the AVPlayer from AVFoundation
                        DESC
@@ -31,9 +31,9 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.source_files = 'Sources/**/*'
-  s.resource_bundles = {
-    'PlayerView' => ['Pod/Assets/*.png']
-  }
+  # s.resource_bundles = {
+  #   'PlayerView' => ['Pod/Assets/*.png']
+  # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
